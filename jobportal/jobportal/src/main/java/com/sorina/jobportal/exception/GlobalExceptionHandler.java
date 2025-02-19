@@ -7,42 +7,47 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Helper method to create JSON error response
+    private ResponseEntity<Map<String, String>> buildErrorResponse(String errorType, String message, HttpStatus status) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", errorType);
+        response.put("message", message);
+        return ResponseEntity.status(status).body(response);
+    }
+
     @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        return buildErrorResponse("User Already Exists", ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity handleInvalidTokenException(InvalidTokenException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleInvalidTokenException(InvalidTokenException ex) {
+        return buildErrorResponse("Invalid Token", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ExpiredTokenException.class)
-    public ResponseEntity handleExpiredTokenException(ExpiredTokenException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleExpiredTokenException(ExpiredTokenException ex) {
+        return buildErrorResponse("Expired Token", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        return buildErrorResponse("User Not Found", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException ex) {
+        return buildErrorResponse("Invalid Credentials", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleGeneralException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An unexpected error occurred: " + ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        return buildErrorResponse("Internal Server Error", "An unexpected error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
