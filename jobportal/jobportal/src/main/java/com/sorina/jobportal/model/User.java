@@ -1,5 +1,6 @@
 package com.sorina.jobportal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,6 +34,7 @@ public class User implements UserDetails {
     Role role;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Token> tokens;
 
     public Integer getId() {

@@ -42,11 +42,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("/login/**","/register/**", "/refresh_token/**")
+                        req->req.requestMatchers("/login/**","/register/**", "/refresh_token/**", "/api/test/**")
                                 .permitAll()
-                                .requestMatchers("/admin_only/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/jobseeker/**").hasAuthority("JOB_SEEKER")
+                                .requestMatchers("/api/recruiter/**").hasAuthority("RECRUITER")
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(userDetailsServiceImp)
@@ -75,6 +77,22 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // ✅ Allow ONLY specific frontend origin
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:4200"));
+
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true); // ✅ Required for JWT authentication
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
 

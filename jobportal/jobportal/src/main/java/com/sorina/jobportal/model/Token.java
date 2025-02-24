@@ -1,5 +1,6 @@
 package com.sorina.jobportal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +23,7 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     public Integer getId() {

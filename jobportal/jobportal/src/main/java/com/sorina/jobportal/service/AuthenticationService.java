@@ -1,9 +1,10 @@
 package com.sorina.jobportal.service;
 
+
 import com.sorina.jobportal.exception.UsernameAlreadyExistsException;
-import com.sorina.jobportal.model.AuthenticationResponse;
-import com.sorina.jobportal.model.Token;
-import com.sorina.jobportal.model.User;
+import com.sorina.jobportal.model.*;
+import com.sorina.jobportal.repository.JobSeekerProfileRepository;
+import com.sorina.jobportal.repository.RecruiterProfileRepository;
 import com.sorina.jobportal.repository.TokenRepository;
 import com.sorina.jobportal.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,12 +34,18 @@ public class AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, TokenRepository tokenRepository) {
+    private final JobSeekerProfileRepository jobSeekerProfileRepository;
+
+    private final RecruiterProfileRepository recruiterProfileRepository;
+
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, TokenRepository tokenRepository, JobSeekerProfileRepository jobSeekerProfileRepository, RecruiterProfileRepository recruiterProfileRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.tokenRepository = tokenRepository;
+        this.jobSeekerProfileRepository = jobSeekerProfileRepository;
+        this.recruiterProfileRepository = recruiterProfileRepository;
     }
 
     public AuthenticationResponse register(User request){
@@ -57,6 +64,9 @@ public class AuthenticationService {
 
         user = userRepository.save(user);
 
+        // Call the profile creation method
+        createUserProfile(user);
+
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -67,6 +77,25 @@ public class AuthenticationService {
 
     }
 
+    public void createUserProfile(User user) {
+        switch (user.getRole()) {
+            case JOB_SEEKER -> {
+                JobSeekerProfile jobSeekerProfile = new JobSeekerProfile();
+                jobSeekerProfile.setUser(user); // Link profile to user
+                jobSeekerProfile.setFirstName(user.getFirstName());
+                jobSeekerProfile.setLastName(user.getLastName());
+                jobSeekerProfileRepository.save(jobSeekerProfile); // Save profile
+            }
+            case RECRUITER -> {
+                RecruiterProfile recruiterProfile = new RecruiterProfile();
+                recruiterProfile.setUser(user);
+                recruiterProfile.setFirstName(user.getFirstName());
+                recruiterProfile.setLastName(user.getLastName());
+                recruiterProfileRepository.save(recruiterProfile);
+            }
+            default -> throw new IllegalArgumentException("Unsupported role: " + user.getRole());
+        }
+    }
 
     public AuthenticationResponse authenticate(User request){
         User user = userRepository.findByUsername(request.getUsername())
