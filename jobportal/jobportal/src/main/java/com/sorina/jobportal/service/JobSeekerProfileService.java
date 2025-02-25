@@ -21,13 +21,13 @@ public class JobSeekerProfileService {
         this.userRepository = userRepository;
     }
 
-    public JobSeekerProfile getProfileByUserId(int userId) {
+    public JobSeekerProfile getJobSeekerProfileByUserId(int userId) {
         return jobSeekerProfileRepository.findById(userId)
                 .orElseThrow(() -> new JobSeekerProfileNotFoundException("Job Seeker Profile not found for user ID: " + userId));
     }
 
     public JobSeekerProfile updateProfile(int userId, JobSeekerProfile updatedProfile) {
-        JobSeekerProfile existingProfile = getProfileByUserId(userId);
+        JobSeekerProfile existingProfile = getJobSeekerProfileByUserId(userId);
         existingProfile.setFirstName(updatedProfile.getFirstName());
         existingProfile.setLastName(updatedProfile.getLastName());
         existingProfile.setCity(updatedProfile.getCity());

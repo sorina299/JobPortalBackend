@@ -47,8 +47,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req.requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/api/test/**")
                                 .permitAll()
-                                .requestMatchers("/jobseeker/**").hasAuthority("JOB_SEEKER")
-                                .requestMatchers("/recruiter/**").hasAuthority("RECRUITER")
+                                .requestMatchers("/jobseeker-profile/**").hasAuthority("JOB_SEEKER")
+                                .requestMatchers("/recruiter-profile/**").hasAuthority("RECRUITER")
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(userDetailsServiceImp)

@@ -91,6 +91,9 @@ public class JwtService {
         }
     }
 
+    public Integer extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Integer.class));
+    }
 
     public String generateAccessToken(User user) {
         return generateToken(user, accessTokenExpire);
@@ -103,6 +106,7 @@ public class JwtService {
     public String generateToken(User user, long expireTime) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRole().name());
+        claims.put("userId", user.getId());
 
         String token = Jwts
                 .builder()
