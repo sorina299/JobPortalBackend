@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/recruiter")
+@RequestMapping("/recruiter")
 public class RecruiterProfileController {
 
     private final RecruiterProfileService recruiterProfileService;

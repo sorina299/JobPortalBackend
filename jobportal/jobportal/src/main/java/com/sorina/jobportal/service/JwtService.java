@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.HashMap;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
@@ -36,15 +38,19 @@ public class JwtService {
         this.tokenRepository = tokenRepository;
     }
 
-    public String extractUsername(String token){
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isValid(String token, UserDetails user){
+    public String extractUserRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class)); // Extract role from claims
+    }
+
+    public boolean isValid(String token, UserDetails user) {
         String username = extractUsername(token);
 
         boolean isValidToken = tokenRepository.findByAccessToken(token)
-                .map(t->!t.isLoggedOut()).orElse(false);
+                .map(t -> !t.isLoggedOut()).orElse(false);
 
         return (username.equals(user.getUsername())) && !isTokenExpired(token) && isValidToken;
     }
@@ -53,7 +59,7 @@ public class JwtService {
         String username = extractUsername(token);
 
         boolean isValidRefreshToken = tokenRepository.findByRefreshToken(token)
-                .map(t->!t.isLoggedOut()).orElse(false);
+                .map(t -> !t.isLoggedOut()).orElse(false);
 
         return (username.equals(user.getUsername())) && !isTokenExpired(token) && isValidRefreshToken;
     }
@@ -66,7 +72,7 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> resolver){
+    public <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = extractAllClaims(token);
         return resolver.apply(claims);
     }
@@ -86,18 +92,22 @@ public class JwtService {
     }
 
 
-    public String generateAccessToken(User user){
+    public String generateAccessToken(User user) {
         return generateToken(user, accessTokenExpire);
     }
 
-    public String generateRefreshToken(User user){
+    public String generateRefreshToken(User user) {
         return generateToken(user, refreshTokenExpire);
     }
 
-    public String generateToken(User user, long expireTime){
+    public String generateToken(User user, long expireTime) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", user.getRole().name());
+
         String token = Jwts
                 .builder()
-                .subject(user.getUsername())
+                .setClaims(claims) // Set claims including role
+                .setSubject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(getSigninKey())
@@ -106,7 +116,7 @@ public class JwtService {
         return token;
     }
 
-    private SecretKey getSigninKey(){
+    private SecretKey getSigninKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

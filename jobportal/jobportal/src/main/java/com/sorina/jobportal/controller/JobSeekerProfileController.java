@@ -7,12 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/jobseeker")
-@CrossOrigin("*")
+@RequestMapping("/jobseeker")
 public class JobSeekerProfileController {
 
     @Autowired
-    private JobSeekerProfileService jobSeekerProfileService;
+    private final JobSeekerProfileService jobSeekerProfileService;
+
+    public JobSeekerProfileController(JobSeekerProfileService jobSeekerProfileService) {
+        this.jobSeekerProfileService = jobSeekerProfileService;
+    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<JobSeekerProfile> getProfile(@PathVariable int userId) {

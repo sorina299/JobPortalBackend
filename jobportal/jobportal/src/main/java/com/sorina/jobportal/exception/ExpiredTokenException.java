@@ -5,3 +5,4 @@ public class ExpiredTokenException extends RuntimeException {
         super(message);
     }
 }
+

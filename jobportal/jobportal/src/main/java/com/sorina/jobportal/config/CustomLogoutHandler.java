@@ -24,7 +24,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
         String authHeader = request.getHeader("Authorization");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
 
@@ -36,7 +36,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         // invalidate the token i.e. make logout true
 
 
-        if(storedToken != null) {
+        if (storedToken != null) {
             storedToken.setLoggedOut(true);
             tokenRepository.save(storedToken);
         }
