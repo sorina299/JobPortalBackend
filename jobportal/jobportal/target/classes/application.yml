@@ -20,3 +20,6 @@ application:
       secret-key: c6f35efd574cd9c9d00c8cf07826cd4bd8c5fd34a100275e6d9e54ba06734f12
       access-token-expiration: 86400000 # 24h
       refresh-token-expiration: 604800000 # 7 days
+
+file:
+  upload-dir: uploads

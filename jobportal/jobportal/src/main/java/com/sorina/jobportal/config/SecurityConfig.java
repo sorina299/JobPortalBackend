@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req -> req.requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/api/test/**")
+                        req -> req.requestMatchers("/login/**", "/register/**", "/refresh_token/**", "/api/test/**", "/uploads/**")
                                 .permitAll()
                                 .requestMatchers("/jobseeker-profile/**").hasAuthority("JOB_SEEKER")
                                 .requestMatchers("/recruiter-profile/**").hasAuthority("RECRUITER")
@@ -95,4 +95,3 @@ public class SecurityConfig {
         return source;
     }
 }
-
