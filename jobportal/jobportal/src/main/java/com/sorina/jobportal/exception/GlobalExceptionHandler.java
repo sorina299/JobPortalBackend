@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException ex) {
-        return buildErrorResponse("Invalid Credentials", "Incorrect username or password", HttpStatus.UNAUTHORIZED);
+        return buildErrorResponse("Invalid Credentials", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
@@ -51,6 +51,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RecruiterProfileNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleRecruiterProfileNotFoundException(RecruiterProfileNotFoundException ex) {
         return buildErrorResponse("Recruiter Profile Not Found", ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return buildErrorResponse("Invalid Password Change", ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Map<String, String>> buildErrorResponse(String error, String message, HttpStatus status) {

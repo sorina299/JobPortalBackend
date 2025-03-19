@@ -2,6 +2,7 @@ package com.sorina.jobportal.service;
 
 
 import com.sorina.jobportal.exception.ExpiredTokenException;
+import com.sorina.jobportal.exception.InvalidPasswordException;
 import com.sorina.jobportal.exception.InvalidTokenException;
 import com.sorina.jobportal.exception.UsernameAlreadyExistsException;
 import com.sorina.jobportal.model.*;
@@ -85,7 +86,7 @@ public class AuthenticationService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         } catch (BadCredentialsException ex) {
-            throw new BadCredentialsException("Bad credentials " + request.getUsername());
+            throw new BadCredentialsException("Bad credentials for user " + request.getUsername());
         }
 
         String accessToken = jwtService.generateAccessToken(user);
@@ -169,6 +170,30 @@ public class AuthenticationService {
         token.setLoggedOut(false);
         token.setUser(user);
         tokenRepository.save(token);
+    }
+
+    public void changePassword(String username, ChangePasswordRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Step 1: Validate old password
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Incorrect current password");
+        }
+
+        // Step 2: Check if new password matches confirm password
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidPasswordException("New password and confirm password do not match");
+        }
+
+        // Step 3: Ensure the new password is different from the old one
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("New password cannot be the same as the old password");
+        }
+
+        // Step 4: Encrypt and update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
 
