@@ -1,7 +1,6 @@
 package com.sorina.jobportal.controller;
 
 import com.sorina.jobportal.model.JobSeekerProfile;
-import com.sorina.jobportal.model.RecruiterProfile;
 import com.sorina.jobportal.service.JobSeekerProfileService;
 import com.sorina.jobportal.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;

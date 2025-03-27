@@ -23,7 +23,7 @@ public class RecruiterProfileController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<RecruiterProfile> getRecruiterProfile(@RequestHeader("Authorization") String token) {
         // Extract userId from token
         String jwt = token.substring(7); // Remove "Bearer " prefix
@@ -32,7 +32,7 @@ public class RecruiterProfileController {
         return ResponseEntity.ok(recruiterProfileService.getRecruiterProfileByUserId(userId));
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<RecruiterProfile> updateRecruiterProfile(
             @RequestHeader("Authorization") String token,
             @RequestPart("profile") String profileJson, // Change from RecruiterProfile to String
