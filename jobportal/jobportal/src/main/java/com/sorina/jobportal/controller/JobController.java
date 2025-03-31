@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/jobs")
@@ -35,12 +36,21 @@ public class JobController {
         return ResponseEntity.ok(jobService.getAllJobs());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getJobById(@PathVariable Integer id) {
-        return jobService.getJobById(id)
+    @GetMapping("/{jobId}")
+    public ResponseEntity<?> getJobById(@PathVariable Integer jobId) {
+        return jobService.getJobById(jobId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/my-jobs")
+    public ResponseEntity<?> getJobsByRecruiter(@RequestHeader("Authorization") String token) {
+        String jwt = token.substring(7);
+        int recruiterId = jwtService.extractUserId(jwt);
+
+        return ResponseEntity.ok(jobService.getJobsByRecruiterId(recruiterId));
+    }
+
 
     @PostMapping
     public ResponseEntity<Job> createJob(
@@ -86,12 +96,12 @@ public class JobController {
         // Get the existing job
         Job existingJob = jobService.getJobById(jobId).orElse(null);
         if (existingJob == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Job not found"));
         }
 
         // Check if the authenticated recruiter is the owner
         if (existingJob.getPostedById().getId() != recruiterId) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to update this job");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","You are not authorized to update this job"));
         }
 
         // Update location and company
@@ -119,7 +129,7 @@ public class JobController {
     }
 
     @DeleteMapping("/{jobId}")
-    public ResponseEntity<String> deleteJob(
+    public ResponseEntity<Map<String, String>> deleteJob(
             @RequestHeader("Authorization") String token,
             @PathVariable Integer jobId) {
 
@@ -128,17 +138,18 @@ public class JobController {
 
         Job jobToDelete = jobService.getJobById(jobId).orElse(null);
         if (jobToDelete == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Job not found"));
         }
 
         if (jobToDelete.getPostedById().getId() != recruiterId) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this job");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are not authorized to delete this job"));
         }
 
-        //Delete job and cleanup orphaned data
         jobService.deleteJobWithOrphanCheck(jobId);
 
-        return ResponseEntity.ok("Job and unused related data deleted successfully");
+        return ResponseEntity.ok(Map.of("message", "Job and unused related data deleted successfully"));
     }
 
 }

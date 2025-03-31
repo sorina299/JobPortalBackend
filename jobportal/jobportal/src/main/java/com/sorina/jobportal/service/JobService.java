@@ -77,4 +77,9 @@ public class JobService {
         }
     }
 
+    public List<Job> getJobsByRecruiterId(Integer recruiterId) {
+        return jobRepository.findByPostedById_Id(recruiterId);
+    }
+
+
 }

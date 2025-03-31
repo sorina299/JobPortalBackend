@@ -3,8 +3,6 @@ package com.sorina.jobportal.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.validation.constraints.Size;
-
 import java.util.Date;
 
 @Entity
@@ -27,7 +25,7 @@ public class Job {
     @JoinColumn(name = "jobCompanyId", referencedColumnName = "Id")
     private JobCompany jobCompanyId;
 
-    @Size(max = 10000)
+    @Column(columnDefinition = "LONGTEXT")
     private String descriptionOfJob;
 
     private String jobType;
