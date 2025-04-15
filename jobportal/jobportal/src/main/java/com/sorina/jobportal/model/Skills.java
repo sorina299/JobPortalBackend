@@ -1,5 +1,6 @@
 package com.sorina.jobportal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +17,7 @@ public class Skills {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "job_seeker_profile")
+    @JsonIgnore
     private JobSeekerProfile jobSeekerProfile;
 
     public Skills() {

@@ -1,55 +1,21 @@
-package com.sorina.jobportal.model;
+package com.sorina.jobportal.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "job_seeker_profile")
-public class JobSeekerProfile {
-
-    @Id
-    @Column(name = "user_account_id")
-    private int userAccountId;
-
-    @OneToOne
-    @JoinColumn(name = "user_account_id")
-    @MapsId
-    @JsonIgnore
-    private User user;
-
-    @Column(name = "first_name")
+public class JobSeekerProfileDTO {
     private String firstName;
-
-    @Column(name = "last_name")
     private String lastName;
-
-    @Column(name = "city")
     private String city;
-
-    @Column(name = "state")
     private String state;
-
-    @Column(name = "country")
     private String country;
-
-    @Column(name = "resume")
     private String resume;
-
-    @Column(name = "profile_photo", nullable = true, length = 64)
     private String profilePhoto;
+    private List<SkillDTO> skills;
 
-    @OneToMany(mappedBy = "jobSeekerProfile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Skills> skills = new ArrayList<>();
-
-    public JobSeekerProfile() {
+    public JobSeekerProfileDTO() {
     }
 
-    public JobSeekerProfile(int userAccountId, User user, String firstName, String lastName, String city, String state, String country, String resume, String profilePhoto, List<Skills> skills) {
-        this.userAccountId = userAccountId;
-        this.user = user;
+    public JobSeekerProfileDTO(String firstName, String lastName, String city, String state, String country, String resume, String profilePhoto, List<SkillDTO> skills) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
@@ -58,22 +24,6 @@ public class JobSeekerProfile {
         this.resume = resume;
         this.profilePhoto = profilePhoto;
         this.skills = skills;
-    }
-
-    public int getUserAccountId() {
-        return userAccountId;
-    }
-
-    public void setUserAccountId(int userAccountId) {
-        this.userAccountId = userAccountId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getFirstName() {
@@ -132,20 +82,18 @@ public class JobSeekerProfile {
         this.profilePhoto = profilePhoto;
     }
 
-    public List<Skills> getSkills() {
+    public List<SkillDTO> getSkills() {
         return skills;
     }
 
-    public void setSkills(List<Skills> skills) {
+    public void setSkills(List<SkillDTO> skills) {
         this.skills = skills;
     }
 
     @Override
     public String toString() {
-        return "JobSeekerProfile{" +
-                "userAccountId=" + userAccountId +
-                ", user=" + user +
-                ", firstName='" + firstName + '\'' +
+        return "JobSeekerProfileDTO{" +
+                "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
@@ -156,3 +104,4 @@ public class JobSeekerProfile {
                 '}';
     }
 }
+
