@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class JobSeekerProfileService {
@@ -45,52 +43,39 @@ public class JobSeekerProfileService {
     }
 
     @Transactional
-    public JobSeekerProfile updateProfileFromDto(int userId, JobSeekerProfileDTO dto, MultipartFile file) throws IOException {
+    public JobSeekerProfile updateProfileFromDto(int userId, JobSeekerProfileDTO dto, MultipartFile imageFile, MultipartFile resumeFile) throws IOException {
         JobSeekerProfile profile = getJobSeekerProfileByUserId(userId);
 
-        // Update primitive fields
         profile.setFirstName(dto.getFirstName());
         profile.setLastName(dto.getLastName());
         profile.setCity(dto.getCity());
         profile.setState(dto.getState());
         profile.setCountry(dto.getCountry());
-        profile.setResume(dto.getResume());
-        profile.setProfilePhoto(dto.getProfilePhoto());
 
-        // Remove existing skills safely
-        if (profile.getSkills() != null) {
-            for (Skills s : new ArrayList<>(profile.getSkills())) {
-                s.setJobSeekerProfile(null);  // break the link
-            }
-            profile.getSkills().clear();  // clear current list
+        // Save profile photo if uploaded
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageFileName = userId + "_" + System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+            Path imagePath = Paths.get(uploadDir, imageFileName);
+            Files.createDirectories(imagePath.getParent());
+            Files.write(imagePath, imageFile.getBytes());
+            profile.setProfilePhoto("/uploads/" + imageFileName);
+        } else {
+            profile.setProfilePhoto(dto.getProfilePhoto()); // fallback
         }
 
-        // Add new skills
-        if (dto.getSkills() != null) {
-            for (SkillDTO s : dto.getSkills()) {
-                Skills skill = new Skills();
-                skill.setName(s.getName());
-                skill.setExperienceLevel(s.getExperienceLevel());
-                skill.setYearsOfExperience(s.getYearsOfExperience());
-                skill.setJobSeekerProfile(profile); // important!
-                profile.getSkills().add(skill);
-            }
-        }
-
-        // Handle image upload
-        if (file != null && !file.isEmpty()) {
-            String fileName = userId + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
-            Files.createDirectories(filePath.getParent());
-            Files.write(filePath, file.getBytes());
-            profile.setProfilePhoto("/uploads/" + fileName);
+        // ✅ Save resume file if uploaded
+        if (resumeFile != null && !resumeFile.isEmpty()) {
+            String resumeFileName = userId + "_" + System.currentTimeMillis() + "_" + resumeFile.getOriginalFilename();
+            Path resumePath = Paths.get(uploadDir, "resumes", resumeFileName);
+            Files.createDirectories(resumePath.getParent());
+            Files.write(resumePath, resumeFile.getBytes());
+            profile.setResume("/uploads/resumes/" + resumeFileName);
+        } else {
+            profile.setResume(dto.getResume()); // fallback
         }
 
         return jobSeekerProfileRepository.save(profile);
     }
-
-
-
 
     public String uploadProfileImage(int userId, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -119,8 +104,8 @@ public class JobSeekerProfileService {
 
         // Ensure only PDFs or DOCX allowed (optional but good practice)
         String contentType = file.getContentType();
-        if (!contentType.equals("application/pdf") && !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-            throw new IllegalArgumentException("Only PDF or DOCX files are allowed");
+        if (!contentType.equals("application/pdf")){
+            throw new IllegalArgumentException("Only PDF files are allowed");
         }
 
         // Save file

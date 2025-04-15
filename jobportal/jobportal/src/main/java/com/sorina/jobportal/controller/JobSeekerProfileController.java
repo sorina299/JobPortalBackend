@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/jobseeker-profile")
@@ -36,7 +38,8 @@ public class JobSeekerProfileController {
     public ResponseEntity<JobSeekerProfile> updateJobSeekerProfile(
             @RequestHeader("Authorization") String token,
             @RequestPart("profile") String profileJson,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "file", required = false) MultipartFile imageFile,
+            @RequestPart(value = "resume", required = false) MultipartFile resumeFile) {
 
         try {
             String jwt = token.substring(7);
@@ -45,15 +48,14 @@ public class JobSeekerProfileController {
             ObjectMapper objectMapper = new ObjectMapper();
             JobSeekerProfileDTO dto = objectMapper.readValue(profileJson, JobSeekerProfileDTO.class);
 
-            JobSeekerProfile updated = jobSeekerProfileService.updateProfileFromDto(userId, dto, file);
+            JobSeekerProfile updated = jobSeekerProfileService.updateProfileFromDto(userId, dto, imageFile, resumeFile);
             return ResponseEntity.ok(updated);
-
         } catch (Exception e) {
-            e.printStackTrace(); // ✅ Add this
-            return ResponseEntity.internalServerError()
-                    .body(null); // Optional: or wrap in a custom response if needed
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(null);
         }
     }
+
 
     @PostMapping("/upload-image")
     public ResponseEntity<String> uploadImage(
@@ -72,7 +74,7 @@ public class JobSeekerProfileController {
     }
 
     @PostMapping("/upload-resume")
-    public ResponseEntity<String> uploadResume(
+    public ResponseEntity<Map<String, String>> uploadResume(
             @RequestHeader("Authorization") String token,
             @RequestParam("file") MultipartFile file) {
         try {
@@ -80,10 +82,13 @@ public class JobSeekerProfileController {
             int userId = jwtService.extractUserId(jwt);
 
             String resumeUrl = jobSeekerProfileService.uploadResume(userId, file);
-            return ResponseEntity.ok(resumeUrl);
+            Map<String, String> response = new HashMap<>();
+            response.put("url", resumeUrl); // ✅ Wrap the string inside JSON
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error saving resume: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error saving resume: " + e.getMessage()));
         }
     }
+
 }
 
