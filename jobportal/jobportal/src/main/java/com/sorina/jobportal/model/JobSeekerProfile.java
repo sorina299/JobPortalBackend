@@ -35,9 +35,6 @@ public class JobSeekerProfile {
     @Column(name = "country")
     private String country;
 
-    @Column(name = "resume")
-    private String resume;
-
     @Column(name = "profile_photo", nullable = true, length = 64)
     private String profilePhoto;
 
@@ -47,7 +44,7 @@ public class JobSeekerProfile {
     public JobSeekerProfile() {
     }
 
-    public JobSeekerProfile(int userAccountId, User user, String firstName, String lastName, String city, String state, String country, String resume, String profilePhoto, List<Skills> skills) {
+    public JobSeekerProfile(int userAccountId, User user, String firstName, String lastName, String city, String state, String country, String profilePhoto, List<Skills> skills) {
         this.userAccountId = userAccountId;
         this.user = user;
         this.firstName = firstName;
@@ -55,7 +52,6 @@ public class JobSeekerProfile {
         this.city = city;
         this.state = state;
         this.country = country;
-        this.resume = resume;
         this.profilePhoto = profilePhoto;
         this.skills = skills;
     }
@@ -116,14 +112,6 @@ public class JobSeekerProfile {
         this.country = country;
     }
 
-    public String getResume() {
-        return resume;
-    }
-
-    public void setResume(String resume) {
-        this.resume = resume;
-    }
-
     public String getProfilePhoto() {
         return profilePhoto;
     }
@@ -150,7 +138,6 @@ public class JobSeekerProfile {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", resume='" + resume + '\'' +
                 ", profilePhoto='" + profilePhoto + '\'' +
                 ", skills=" + skills +
                 '}';

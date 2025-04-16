@@ -8,20 +8,18 @@ public class JobSeekerProfileDTO {
     private String city;
     private String state;
     private String country;
-    private String resume;
     private String profilePhoto;
     private List<SkillDTO> skills;
 
     public JobSeekerProfileDTO() {
     }
 
-    public JobSeekerProfileDTO(String firstName, String lastName, String city, String state, String country, String resume, String profilePhoto, List<SkillDTO> skills) {
+    public JobSeekerProfileDTO(String firstName, String lastName, String city, String state, String country, String profilePhoto, List<SkillDTO> skills) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
         this.state = state;
         this.country = country;
-        this.resume = resume;
         this.profilePhoto = profilePhoto;
         this.skills = skills;
     }
@@ -66,14 +64,6 @@ public class JobSeekerProfileDTO {
         this.country = country;
     }
 
-    public String getResume() {
-        return resume;
-    }
-
-    public void setResume(String resume) {
-        this.resume = resume;
-    }
-
     public String getProfilePhoto() {
         return profilePhoto;
     }
@@ -98,7 +88,6 @@ public class JobSeekerProfileDTO {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", resume='" + resume + '\'' +
                 ", profilePhoto='" + profilePhoto + '\'' +
                 ", skills=" + skills +
                 '}';

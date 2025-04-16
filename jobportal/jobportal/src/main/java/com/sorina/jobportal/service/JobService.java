@@ -81,5 +81,7 @@ public class JobService {
         return jobRepository.findByPostedById_Id(recruiterId);
     }
 
-
+    public List<Job> searchJobs(String keyword) {
+        return jobRepository.searchJobsByKeyword(keyword);
+    }
 }

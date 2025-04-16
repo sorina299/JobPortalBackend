@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -152,4 +153,9 @@ public class JobController {
         return ResponseEntity.ok(Map.of("message", "Job and unused related data deleted successfully"));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchJobs(@RequestParam("q") String query) {
+        List<Job> results = jobService.searchJobs(query);
+        return ResponseEntity.ok(results);
+    }
 }

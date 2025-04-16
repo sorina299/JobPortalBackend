@@ -13,6 +13,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        return buildErrorResponse("Error", ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
         return buildErrorResponse("User Already Exists", ex.getMessage(), HttpStatus.CONFLICT);
