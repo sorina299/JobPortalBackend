@@ -156,10 +156,14 @@ public class JobController {
     @GetMapping("/search")
     public ResponseEntity<List<Job>> searchJobs(
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) String location
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) List<String> jobTypes,
+            @RequestParam(required = false) List<String> remoteOptions,
+            @RequestParam(required = false) String datePosted // could be "today", "7days", "30days"
     ) {
-        List<Job> jobs = jobService.searchJobsByTitleAndLocation(title, location);
+        List<Job> jobs = jobService.advancedSearch(title, location, jobTypes, remoteOptions, datePosted);
         return ResponseEntity.ok(jobs);
     }
+
 
 }

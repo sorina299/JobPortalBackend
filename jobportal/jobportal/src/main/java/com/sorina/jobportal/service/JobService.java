@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,7 +92,30 @@ public class JobService {
         return jobRepository.findByPostedById_Id(recruiterId);
     }
 
-    public List<Job> searchJobsByTitleAndLocation(String title, String location) {
-        return jobRepository.searchJobsByTitleAndLocation(title, location);
+    public List<Job> advancedSearch(String title, String location, List<String> jobTypes, List<String> remoteOptions, String datePosted) {
+        return jobRepository.advancedSearch(
+                title,
+                location,
+                jobTypes,
+                remoteOptions,
+                computeDateThreshold(datePosted)
+        );
     }
+
+    private Date computeDateThreshold(String filter) {
+        if (filter == null) return null;
+        LocalDate today = LocalDate.now();
+
+        switch (filter.toLowerCase()) {
+            case "today":
+                return Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            case "7days":
+                return Date.from(today.minusDays(7).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            case "30days":
+                return Date.from(today.minusDays(30).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            default:
+                return null;
+        }
+    }
+
 }
