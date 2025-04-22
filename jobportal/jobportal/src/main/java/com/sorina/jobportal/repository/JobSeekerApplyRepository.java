@@ -10,4 +10,6 @@ import java.util.List;
 public interface JobSeekerApplyRepository extends JpaRepository<JobSeekerApply, Integer> {
     List<JobSeekerApply> findByUser_UserAccountId(int userId);
     boolean existsByUserAndJob(JobSeekerProfile user, Job job);
+
+    void deleteByJob(Job job);
 }

@@ -19,11 +19,12 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
 
     List<Job> findByPostedById_Id(Integer recruiterId);
 
-    // New search method
-    @Query("SELECT j FROM Job j WHERE LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(j.jobLocationId.city) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(j.jobLocationId.state) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(j.jobLocationId.country) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Job> searchJobsByKeyword(@Param("keyword") String keyword);
+    @Query("SELECT j FROM Job j WHERE " +
+            "(:title IS NULL OR LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+            "(:location IS NULL OR LOWER(j.jobLocationId.city) LIKE LOWER(CONCAT('%', :location, '%')) " +
+            "OR LOWER(j.jobLocationId.country) LIKE LOWER(CONCAT('%', :location, '%')) " +
+            "OR LOWER(j.jobLocationId.state) LIKE LOWER(CONCAT('%', :location, '%')))")
+    List<Job> searchJobsByTitleAndLocation(@Param("title") String title, @Param("location") String location);
+
 
 }
