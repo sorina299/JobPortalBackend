@@ -1,5 +1,7 @@
 package com.sorina.jobportal.service;
 
+import com.sorina.jobportal.dto.AppliedCandidateDTO;
+import com.sorina.jobportal.dto.SkillDTO;
 import com.sorina.jobportal.model.Job;
 import com.sorina.jobportal.model.JobSeekerApply;
 import com.sorina.jobportal.model.JobSeekerProfile;
@@ -74,6 +76,37 @@ public class JobSeekerApplyService {
 
     public List<JobSeekerApply> getApplicationsForUser(int userId) {
         return applyRepository.findByUser_UserAccountId(userId);
+    }
+
+    public List<AppliedCandidateDTO> getCandidatesByJobId(int jobId) {
+        List<JobSeekerApply> applications = applyRepository.findByJob_JobId(jobId);
+
+        return applications.stream().map(application -> {
+            JobSeekerProfile profile = application.getUser();
+
+            List<SkillDTO> skills = profile.getSkills().stream().map(skill ->
+                    new SkillDTO(
+                            skill.getName(),
+                            skill.getExperienceLevel(),
+                            skill.getYearsOfExperience()
+                    )
+            ).toList();
+
+            return new AppliedCandidateDTO(
+                    profile.getFirstName(),
+                    profile.getLastName(),
+                    profile.getCity(),
+                    profile.getState(),
+                    profile.getCountry(),
+                    profile.getProfilePhoto(),
+                    skills,
+                    application.getResume() // Resume URL or path
+            );
+        }).toList();
+    }
+
+    public int countApplicantsByJobId(int jobId) {
+        return applyRepository.findByJob_JobId(jobId).size();
     }
 }
 

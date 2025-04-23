@@ -1,25 +1,36 @@
 package com.sorina.jobportal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sorina.jobportal.dto.AppliedCandidateDTO;
 import com.sorina.jobportal.model.RecruiterProfile;
+import com.sorina.jobportal.service.JobSeekerApplyService;
 import com.sorina.jobportal.service.JwtService;
 import com.sorina.jobportal.service.RecruiterProfileService;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 @RequestMapping("/recruiter-profile")
 public class RecruiterProfileController {
 
     private final RecruiterProfileService recruiterProfileService;
+    private final JobSeekerApplyService jobSeekerApplyService;
     private final JwtService jwtService;
     private final String UPLOAD_DIR = "uploads/";
 
-    public RecruiterProfileController(RecruiterProfileService recruiterProfileService, JwtService jwtService) {
+    public RecruiterProfileController(RecruiterProfileService recruiterProfileService, JobSeekerApplyService jobSeekerApplyService, JwtService jwtService) {
         this.recruiterProfileService = recruiterProfileService;
+        this.jobSeekerApplyService = jobSeekerApplyService;
         this.jwtService = jwtService;
     }
 
@@ -69,5 +80,35 @@ public class RecruiterProfileController {
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Error saving image");
         }
+    }
+
+    @GetMapping("/applicants/{jobId}")
+    public ResponseEntity<List<AppliedCandidateDTO>> getApplicantsForJob(@PathVariable int jobId) {
+        return ResponseEntity.ok(jobSeekerApplyService.getCandidatesByJobId(jobId));
+    }
+
+    @GetMapping("/download-resume")
+    public ResponseEntity<Resource> downloadResume(@RequestParam String path) {
+        try {
+            Path filePath = Paths.get("uploads/resumes").resolve(path).normalize(); // ✅ Use filename only
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+    @GetMapping("/count-applicants/{jobId}")
+    public ResponseEntity<Integer> countApplicants(@PathVariable int jobId) {
+        return ResponseEntity.ok(jobSeekerApplyService.countApplicantsByJobId(jobId));
     }
 }

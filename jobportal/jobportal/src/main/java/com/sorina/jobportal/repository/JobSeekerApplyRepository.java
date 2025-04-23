@@ -12,4 +12,7 @@ public interface JobSeekerApplyRepository extends JpaRepository<JobSeekerApply, 
     boolean existsByUserAndJob(JobSeekerProfile user, Job job);
 
     void deleteByJob(Job job);
+
+    List<JobSeekerApply> findByJob_JobId(int jobId);
+
 }
