@@ -10,6 +10,7 @@ public class JobSeekerProfileDTO {
     private String country;
     private String profilePhoto;
     private List<SkillDTO> skills;
+    private List<JobSeekerExperienceDTO> experiences;
 
     public JobSeekerProfileDTO() {
     }

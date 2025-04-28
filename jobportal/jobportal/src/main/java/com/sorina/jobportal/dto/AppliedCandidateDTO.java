@@ -10,12 +10,13 @@ public class AppliedCandidateDTO {
     private String country;
     private String profilePhoto;
     private List<SkillDTO> skills;
+    private List<JobSeekerExperienceDTO> experiences;
     private String resumeUrl;
 
     public AppliedCandidateDTO() {
     }
 
-    public AppliedCandidateDTO(String firstName, String lastName, String city, String state, String country, String profilePhoto, List<SkillDTO> skills, String resumeUrl) {
+    public AppliedCandidateDTO(String firstName, String lastName, String city, String state, String country, String profilePhoto, List<SkillDTO> skills, List<JobSeekerExperienceDTO> experiences, String resumeUrl) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
@@ -23,6 +24,7 @@ public class AppliedCandidateDTO {
         this.country = country;
         this.profilePhoto = profilePhoto;
         this.skills = skills;
+        this.experiences = experiences;
         this.resumeUrl = resumeUrl;
     }
 
@@ -90,6 +92,14 @@ public class AppliedCandidateDTO {
         this.resumeUrl = resumeUrl;
     }
 
+    public List<JobSeekerExperienceDTO> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<JobSeekerExperienceDTO> experiences) {
+        this.experiences = experiences;
+    }
+
     @Override
     public String toString() {
         return "AppliedCandidateDTO{" +
@@ -100,6 +110,7 @@ public class AppliedCandidateDTO {
                 ", country='" + country + '\'' +
                 ", profilePhoto='" + profilePhoto + '\'' +
                 ", skills=" + skills +
+                ", experiences=" + experiences +
                 ", resumeUrl='" + resumeUrl + '\'' +
                 '}';
     }

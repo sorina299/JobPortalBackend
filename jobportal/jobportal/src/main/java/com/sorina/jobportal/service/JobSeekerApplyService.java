@@ -1,9 +1,11 @@
 package com.sorina.jobportal.service;
 
 import com.sorina.jobportal.dto.AppliedCandidateDTO;
+import com.sorina.jobportal.dto.JobSeekerExperienceDTO;
 import com.sorina.jobportal.dto.SkillDTO;
 import com.sorina.jobportal.model.Job;
 import com.sorina.jobportal.model.JobSeekerApply;
+import com.sorina.jobportal.model.JobSeekerExperience;
 import com.sorina.jobportal.model.JobSeekerProfile;
 import com.sorina.jobportal.repository.JobRepository;
 import com.sorina.jobportal.repository.JobSeekerApplyRepository;
@@ -92,6 +94,17 @@ public class JobSeekerApplyService {
                     )
             ).toList();
 
+            List<JobSeekerExperienceDTO> experiences = profile.getExperiences().stream().map(experience ->
+                    new JobSeekerExperienceDTO(
+                            experience.getJobTitle(),
+                            experience.getCompanyName(),
+                            experience.getStartDate(),
+                            experience.getEndDate(),
+                            experience.isOngoing()
+                    )
+            ).toList();
+
+
             return new AppliedCandidateDTO(
                     profile.getFirstName(),
                     profile.getLastName(),
@@ -100,7 +113,8 @@ public class JobSeekerApplyService {
                     profile.getCountry(),
                     profile.getProfilePhoto(),
                     skills,
-                    application.getResume() // Resume URL or path
+                    experiences,
+                    application.getResume()
             );
         }).toList();
     }

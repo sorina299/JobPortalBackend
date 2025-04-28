@@ -41,10 +41,13 @@ public class JobSeekerProfile {
     @OneToMany(mappedBy = "jobSeekerProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Skills> skills = new ArrayList<>();
 
+    @OneToMany(mappedBy = "jobSeekerProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JobSeekerExperience> experiences = new ArrayList<>();
+
     public JobSeekerProfile() {
     }
 
-    public JobSeekerProfile(int userAccountId, User user, String firstName, String lastName, String city, String state, String country, String profilePhoto, List<Skills> skills) {
+    public JobSeekerProfile(int userAccountId, User user, String firstName, String lastName, String city, String state, String country, String profilePhoto, List<Skills> skills, List<JobSeekerExperience> experiences) {
         this.userAccountId = userAccountId;
         this.user = user;
         this.firstName = firstName;
@@ -54,6 +57,7 @@ public class JobSeekerProfile {
         this.country = country;
         this.profilePhoto = profilePhoto;
         this.skills = skills;
+        this.experiences = experiences;
     }
 
     public int getUserAccountId() {
@@ -128,6 +132,14 @@ public class JobSeekerProfile {
         this.skills = skills;
     }
 
+    public List<JobSeekerExperience> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<JobSeekerExperience> experiences) {
+        this.experiences = experiences;
+    }
+
     @Override
     public String toString() {
         return "JobSeekerProfile{" +
@@ -140,6 +152,7 @@ public class JobSeekerProfile {
                 ", country='" + country + '\'' +
                 ", profilePhoto='" + profilePhoto + '\'' +
                 ", skills=" + skills +
+                ", experiences=" + experiences +
                 '}';
     }
 }
