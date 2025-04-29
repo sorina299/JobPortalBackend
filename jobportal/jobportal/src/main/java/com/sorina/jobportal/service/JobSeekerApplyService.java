@@ -5,7 +5,6 @@ import com.sorina.jobportal.dto.JobSeekerExperienceDTO;
 import com.sorina.jobportal.dto.SkillDTO;
 import com.sorina.jobportal.model.Job;
 import com.sorina.jobportal.model.JobSeekerApply;
-import com.sorina.jobportal.model.JobSeekerExperience;
 import com.sorina.jobportal.model.JobSeekerProfile;
 import com.sorina.jobportal.repository.JobRepository;
 import com.sorina.jobportal.repository.JobSeekerApplyRepository;
@@ -26,13 +25,18 @@ public class JobSeekerApplyService {
     private final JobSeekerApplyRepository applyRepository;
     private final JobRepository jobRepository;
     private final JobSeekerProfileRepository profileRepository;
+    private final RecruiterNotificationsService recruiterNotificationsService; // ✅ NEW
 
-    public JobSeekerApplyService(JobSeekerApplyRepository applyRepository,
-                                 JobRepository jobRepository,
-                                 JobSeekerProfileRepository profileRepository) {
+    public JobSeekerApplyService(
+            JobSeekerApplyRepository applyRepository,
+            JobRepository jobRepository,
+            JobSeekerProfileRepository profileRepository,
+            RecruiterNotificationsService recruiterNotificationsService // ✅ Inject it
+    ) {
         this.applyRepository = applyRepository;
         this.jobRepository = jobRepository;
         this.profileRepository = profileRepository;
+        this.recruiterNotificationsService = recruiterNotificationsService; // ✅
     }
 
     public void apply(int userId, int jobId, MultipartFile resumeFile) {
@@ -67,9 +71,15 @@ public class JobSeekerApplyService {
             application.setUser(profile);
             application.setJob(job);
             application.setApplyDate(new Date());
-            application.setResume("/uploads/resumes/" + fileName); // relative path
+            application.setResume("/uploads/resumes/" + fileName);
 
             applyRepository.save(application);
+
+            // ✅ Send notification to the recruiter who posted the job
+            int recruiterId = job.getPostedById().getId();
+            String fullName = profile.getFirstName() + " " + profile.getLastName();
+            String message = fullName + " has applied for your job: " + job.getJobTitle();
+            recruiterNotificationsService.sendNotification(recruiterId, message);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload resume", e);
@@ -94,16 +104,15 @@ public class JobSeekerApplyService {
                     )
             ).toList();
 
-            List<JobSeekerExperienceDTO> experiences = profile.getExperiences().stream().map(experience ->
+            List<JobSeekerExperienceDTO> experiences = profile.getExperiences().stream().map(exp ->
                     new JobSeekerExperienceDTO(
-                            experience.getJobTitle(),
-                            experience.getCompanyName(),
-                            experience.getStartDate(),
-                            experience.getEndDate(),
-                            experience.isOngoing()
+                            exp.getJobTitle(),
+                            exp.getCompanyName(),
+                            exp.getStartDate(),
+                            exp.getEndDate(),
+                            exp.isOngoing()
                     )
             ).toList();
-
 
             return new AppliedCandidateDTO(
                     profile.getFirstName(),
@@ -123,4 +132,3 @@ public class JobSeekerApplyService {
         return applyRepository.findByJob_JobId(jobId).size();
     }
 }
-
