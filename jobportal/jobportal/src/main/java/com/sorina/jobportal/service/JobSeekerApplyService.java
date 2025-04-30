@@ -25,18 +25,18 @@ public class JobSeekerApplyService {
     private final JobSeekerApplyRepository applyRepository;
     private final JobRepository jobRepository;
     private final JobSeekerProfileRepository profileRepository;
-    private final RecruiterNotificationsService recruiterNotificationsService; // ✅ NEW
+    private final NotificationService notificationService; // ✅ NEW
 
     public JobSeekerApplyService(
             JobSeekerApplyRepository applyRepository,
             JobRepository jobRepository,
             JobSeekerProfileRepository profileRepository,
-            RecruiterNotificationsService recruiterNotificationsService // ✅ Inject it
+            NotificationService notificationService // ✅ Inject it
     ) {
         this.applyRepository = applyRepository;
         this.jobRepository = jobRepository;
         this.profileRepository = profileRepository;
-        this.recruiterNotificationsService = recruiterNotificationsService; // ✅
+        this.notificationService = notificationService; // ✅
     }
 
     public void apply(int userId, int jobId, MultipartFile resumeFile) {
@@ -79,7 +79,7 @@ public class JobSeekerApplyService {
             int recruiterId = job.getPostedById().getId();
             String fullName = profile.getFirstName() + " " + profile.getLastName();
             String message = fullName + " has applied for your job: " + job.getJobTitle();
-            recruiterNotificationsService.sendNotification(recruiterId, message);
+            notificationService.sendNotification(recruiterId,"RECRUITER", message);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload resume", e);
@@ -131,4 +131,13 @@ public class JobSeekerApplyService {
     public int countApplicantsByJobId(int jobId) {
         return applyRepository.findByJob_JobId(jobId).size();
     }
+
+    public JobSeekerApply getByResumePath(String resumePath) {
+        return applyRepository.findByResume(resumePath).orElse(null);
+    }
+
+    public void save(JobSeekerApply application) {
+        applyRepository.save(application);
+    }
+
 }

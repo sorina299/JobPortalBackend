@@ -28,16 +28,19 @@ public class JobSeekerApply {
 
     private String resume;
 
+    @Column(name = "cv_viewed")
+    private boolean cvViewed = false;
+
     public JobSeekerApply() {
-        this.applyDate = new Date(); // default to now
     }
 
-    public JobSeekerApply(Integer id, JobSeekerProfile user, Job job, Date applyDate, String resume) {
+    public JobSeekerApply(Integer id, JobSeekerProfile user, Job job, Date applyDate, String resume, boolean cvViewed) {
         this.id = id;
         this.user = user;
         this.job = job;
         this.applyDate = applyDate;
         this.resume = resume;
+        this.cvViewed = cvViewed;
     }
 
     public Integer getId() {
@@ -80,6 +83,14 @@ public class JobSeekerApply {
         this.resume = resume;
     }
 
+    public boolean isCvViewed() {
+        return cvViewed;
+    }
+
+    public void setCvViewed(boolean cvViewed) {
+        this.cvViewed = cvViewed;
+    }
+
     @Override
     public String toString() {
         return "JobSeekerApply{" +
@@ -88,6 +99,7 @@ public class JobSeekerApply {
                 ", job=" + job +
                 ", applyDate=" + applyDate +
                 ", resume='" + resume + '\'' +
+                ", cvViewed=" + cvViewed +
                 '}';
     }
 }

@@ -1,18 +1,19 @@
 package com.sorina.jobportal.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "recruiter_notifications")
-public class RecruiterNotifications {
-
+public class JobSeekerNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int recruiterId;
+    private int jobSeekerId;
 
     private String message;
 
@@ -20,13 +21,12 @@ public class RecruiterNotifications {
 
     private Date createdAt = new Date();
 
-    public RecruiterNotifications() {}
+    public JobSeekerNotification() {
+    }
 
-    public RecruiterNotifications(int recruiterId, String message) {
-        this.recruiterId = recruiterId;
+    public JobSeekerNotification(int jobSeekerId, String message) {
+        this.jobSeekerId = jobSeekerId;
         this.message = message;
-        this.isRead = false;
-        this.createdAt = new Date();
     }
 
     public Long getId() {
@@ -37,12 +37,12 @@ public class RecruiterNotifications {
         this.id = id;
     }
 
-    public int getRecruiterId() {
-        return recruiterId;
+    public int getJobSeekerId() {
+        return jobSeekerId;
     }
 
-    public void setRecruiterId(int recruiterId) {
-        this.recruiterId = recruiterId;
+    public void setJobSeekerId(int jobSeekerId) {
+        this.jobSeekerId = jobSeekerId;
     }
 
     public String getMessage() {
@@ -71,9 +71,9 @@ public class RecruiterNotifications {
 
     @Override
     public String toString() {
-        return "RecruiterNotifications{" +
+        return "JobSeekerNotification{" +
                 "id=" + id +
-                ", recruiterId=" + recruiterId +
+                ", jobSeekerId=" + jobSeekerId +
                 ", message='" + message + '\'' +
                 ", isRead=" + isRead +
                 ", createdAt=" + createdAt +

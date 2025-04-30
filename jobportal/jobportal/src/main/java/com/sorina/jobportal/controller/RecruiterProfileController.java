@@ -2,9 +2,12 @@ package com.sorina.jobportal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sorina.jobportal.dto.AppliedCandidateDTO;
+import com.sorina.jobportal.model.JobSeekerApply;
 import com.sorina.jobportal.model.RecruiterProfile;
+import com.sorina.jobportal.repository.JobSeekerApplyRepository;
 import com.sorina.jobportal.service.JobSeekerApplyService;
 import com.sorina.jobportal.service.JwtService;
+import com.sorina.jobportal.service.NotificationService;
 import com.sorina.jobportal.service.RecruiterProfileService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -26,12 +29,16 @@ public class RecruiterProfileController {
     private final RecruiterProfileService recruiterProfileService;
     private final JobSeekerApplyService jobSeekerApplyService;
     private final JwtService jwtService;
+    private final NotificationService notificationService;
+    private final JobSeekerApplyRepository jobSeekerApplyRepository;
     private final String UPLOAD_DIR = "uploads/";
 
-    public RecruiterProfileController(RecruiterProfileService recruiterProfileService, JobSeekerApplyService jobSeekerApplyService, JwtService jwtService) {
+    public RecruiterProfileController(RecruiterProfileService recruiterProfileService, JobSeekerApplyService jobSeekerApplyService, JwtService jwtService, NotificationService notificationService, JobSeekerApplyRepository jobSeekerApplyRepository) {
         this.recruiterProfileService = recruiterProfileService;
         this.jobSeekerApplyService = jobSeekerApplyService;
         this.jwtService = jwtService;
+        this.notificationService = notificationService;
+        this.jobSeekerApplyRepository = jobSeekerApplyRepository;
     }
 
     @GetMapping
@@ -90,11 +97,24 @@ public class RecruiterProfileController {
     @GetMapping("/download-resume")
     public ResponseEntity<Resource> downloadResume(@RequestParam String path) {
         try {
-            Path filePath = Paths.get("uploads/resumes").resolve(path).normalize(); // ✅ Use filename only
+            Path filePath = Paths.get("uploads/resumes").resolve(path).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists()) {
                 return ResponseEntity.notFound().build();
+            }
+
+            // ✅ Find application by resume path
+            JobSeekerApply application = jobSeekerApplyService.getByResumePath("/uploads/resumes/" + path);
+            if (application != null && !application.isCvViewed()) {
+                application.setCvViewed(true);
+                jobSeekerApplyService.save(application); // persist update
+
+                // ✅ Send notification to the job seeker
+                int jobSeekerId = application.getUser().getUserAccountId();
+                String jobTitle = application.getJob().getJobTitle();
+                String message = "Your application for the role " + jobTitle + " was viewed.";
+                notificationService.sendNotification(jobSeekerId, "JOB_SEEKER", message);
             }
 
             return ResponseEntity.ok()
@@ -105,7 +125,6 @@ public class RecruiterProfileController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
 
     @GetMapping("/count-applicants/{jobId}")
     public ResponseEntity<Integer> countApplicants(@PathVariable int jobId) {

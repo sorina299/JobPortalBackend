@@ -6,6 +6,7 @@ import com.sorina.jobportal.model.JobSeekerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JobSeekerApplyRepository extends JpaRepository<JobSeekerApply, Integer> {
     List<JobSeekerApply> findByUser_UserAccountId(int userId);
@@ -14,5 +15,7 @@ public interface JobSeekerApplyRepository extends JpaRepository<JobSeekerApply, 
     void deleteByJob(Job job);
 
     List<JobSeekerApply> findByJob_JobId(int jobId);
+    Optional<JobSeekerApply> findByResume(String resumePath);
+
 
 }
