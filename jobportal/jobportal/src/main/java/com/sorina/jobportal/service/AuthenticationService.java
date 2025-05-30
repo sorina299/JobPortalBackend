@@ -65,13 +65,11 @@ public class AuthenticationService {
 
         user = userRepository.save(user);
 
-        // Create Profile based on role
         createUserProfile(user);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        // save the generated token
         saveUserToken(accessToken, refreshToken, user);
 
         return new AuthenticationResponse(accessToken, refreshToken);

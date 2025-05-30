@@ -104,13 +104,13 @@ public class RecruiterProfileController {
                 return ResponseEntity.notFound().build();
             }
 
-            // ✅ Find application by resume path
+            //  Find application by resume path
             JobSeekerApply application = jobSeekerApplyService.getByResumePath("/uploads/resumes/" + path);
             if (application != null && !application.isCvViewed()) {
                 application.setCvViewed(true);
                 jobSeekerApplyService.save(application); // persist update
 
-                // ✅ Send notification to the job seeker
+                //  Send notification to the job seeker
                 int jobSeekerId = application.getUser().getUserAccountId();
                 String jobTitle = application.getJob().getJobTitle();
                 String message = "Your application for the role " + jobTitle + " was viewed.";

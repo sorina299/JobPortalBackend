@@ -90,26 +90,21 @@ public class JobController {
             @PathVariable Integer jobId,
             @RequestBody Job updatedJob) {
 
-        // Extract recruiter ID from JWT token
         String jwt = token.substring(7);
         int recruiterId = jwtService.extractUserId(jwt);
 
-        // Get the existing job
         Job existingJob = jobService.getJobById(jobId).orElse(null);
         if (existingJob == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Job not found"));
         }
 
-        // Check if the authenticated recruiter is the owner
         if (existingJob.getPostedById().getId() != recruiterId) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","You are not authorized to update this job"));
         }
 
-        // Update location and company
         JobLocation updatedLocation = jobLocationService.findOrCreateLocation(updatedJob.getJobLocationId());
         JobCompany updatedCompany = jobCompanyService.findOrCreateCompany(updatedJob.getJobCompanyId());
 
-        // Update job details
         existingJob.setJobTitle(updatedJob.getJobTitle());
         existingJob.setDescriptionOfJob(updatedJob.getDescriptionOfJob());
         existingJob.setJobType(updatedJob.getJobType());

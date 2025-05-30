@@ -39,17 +39,14 @@ public class JobService {
     @Autowired
     private JobSeekerApplyRepository jobSeekerApplyRepository;
 
-    // Get all job posts
     public List<Job> getAllJobs() {
         return jobRepository.findAll();
     }
 
-    // Get job post by ID
     public Optional<Job> getJobById(Integer id) {
         return jobRepository.findById(id);
     }
 
-    // Create or update job post
     public Job saveJob(Job jobPostActivity) {
         return jobRepository.save(jobPostActivity);
     }
